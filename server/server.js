@@ -5,6 +5,8 @@ import connectDB from './config/database.js';
 import userRoutes from './routes/userRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import postRoutes from './routes/postRoutes.js';
+import ApiError from './utils/ApiError.js';
+import errorHandler from './middleware/errorHandler.js';
 
 // Load environment variables
 dotenv.config();
@@ -36,6 +38,14 @@ app.get('/api/health', (req, res) => {
     database: 'Connected'
   });
 });
+
+// 404 handler for unknown API routes
+app.use((req, res, next) => {
+  next(new ApiError(404, 'Not Found'));
+});
+
+// Centralized error handler (must be after routes)
+app.use(errorHandler);
 
 // Start server
 app.listen(PORT, () => {
