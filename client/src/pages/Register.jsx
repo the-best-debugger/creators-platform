@@ -100,8 +100,14 @@ const Register = () => {
         password: formData.password
       };
 
+      // Determine API base: prefer VITE_API_URL in production, fallback to dev proxy path
+      const apiBase = import.meta.env.VITE_API_URL || '';
+      const url = apiBase
+        ? `${apiBase.replace(/\/$/, '')}/api/users/register`
+        : '/api/users/register';
+
       // Send POST request to backend
-      const response = await fetch('/api/users/register', {
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -109,7 +115,16 @@ const Register = () => {
         body: JSON.stringify(registrationData)
       });
 
-      const data = await response.json();
+      // Safely parse JSON only when present
+      let data = null;
+      const contentType = response.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        try {
+          data = await response.json();
+        } catch (e) {
+          data = null;
+        }
+      }
 
       if (response.ok) {
         // Registration successful
@@ -130,8 +145,16 @@ const Register = () => {
         }, 2000);
 
       } else {
-        // Registration failed - show error from backend
-        const msg = data.message || 'Registration failed. Please try again.';
+        // Registration failed - prefer backend message when available
+        const msg = data?.message || (await (async () => {
+          try {
+            const text = await response.text();
+            return text || response.statusText || 'Registration failed. Please try again.';
+          } catch (e) {
+            return response.statusText || 'Registration failed. Please try again.';
+          }
+        })());
+
         setApiError(msg);
         toast.error(msg);
       }
