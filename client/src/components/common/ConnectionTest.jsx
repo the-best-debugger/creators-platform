@@ -11,8 +11,11 @@ const ConnectionTest = () => {
     setMessage('');
 
     try {
-      // Using relative URL because of Vite proxy
-      const response = await fetch('/api/health');
+        // Use absolute API URL in production (set VITE_API_URL at build time).
+        // Fallback to relative `/api/health` so Vite dev proxy still works.
+        const base = import.meta.env.VITE_API_URL || '';
+        const url = base ? `${base.replace(/\/$/, '')}/api/health` : '/api/health';
+        const response = await fetch(url);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
