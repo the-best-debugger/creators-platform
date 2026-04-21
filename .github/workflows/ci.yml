@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       MONGODB_URI_TEST: mongodb://127.0.0.1:27017/creator-platform-test
+      JWT_SECRET: test_jwt_secret
     services:
       mongodb:
         image: mongo:6.0
