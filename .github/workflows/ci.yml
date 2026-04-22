@@ -64,6 +64,14 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.x'
+
       - name: Deploy to Render
         run: |
           curl -X GET "${{ secrets.RENDER_DEPLOY_HOOK }}"
