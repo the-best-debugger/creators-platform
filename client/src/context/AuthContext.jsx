@@ -21,6 +21,8 @@ export const AuthProvider = ({ children }) => {
         setUser(JSON.parse(storedUser));
         // Ensure socket connects for authenticated sessions
         try {
+          // ensure the socket auth contains the current token
+          socket.auth = { token: storedToken };
           socket.connect();
         } catch (e) {
           console.warn('Socket connect failed on auth init', e);
@@ -48,6 +50,7 @@ export const AuthProvider = ({ children }) => {
 
     // Connect socket after login
     try {
+      socket.auth = { token: userToken };
       socket.connect();
     } catch (e) {
       console.warn('Socket connect failed on login', e);
@@ -66,6 +69,8 @@ export const AuthProvider = ({ children }) => {
     
     // Redirect to login
     try {
+      // clear auth and disconnect
+      try { socket.auth = {}; } catch (e) {}
       socket.disconnect();
     } catch (e) {
       console.warn('Socket disconnect failed on logout', e);
