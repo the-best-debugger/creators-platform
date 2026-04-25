@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import socket from '../services/socket';
 import api from '../services/api';
-import { toast } from 'react-toastify';
+import { toast as toastify } from 'react-toastify';
+import toast from 'react-hot-toast';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -32,6 +33,7 @@ const Dashboard = () => {
       console.log('socket event received: newPost', data);
       try {
         const message = data?.message ?? `New post created`;
+        // use react-hot-toast for realtime notifications
         toast.success(message);
 
         // Refresh first page so the new post appears without manual refresh
@@ -69,7 +71,8 @@ const Dashboard = () => {
       console.log('socket event received: updatePost', data);
       try {
         const message = data?.message ?? 'A post was updated';
-        toast.info(message);
+        // using hot-toast for realtime notifications
+        toast(message);
 
         // Refresh first page
         try {
@@ -100,7 +103,8 @@ const Dashboard = () => {
       console.log('socket event received: deletePost', data);
       try {
         const message = data?.message ?? 'A post was deleted';
-        toast.info(message);
+        // using hot-toast for realtime notifications
+        toast(message);
 
         // Refresh first page
         try {
@@ -197,8 +201,8 @@ const Dashboard = () => {
           total: prev.total - 1
         }));
 
-        // Show success toast
-        toast.success('Post deleted successfully');
+        // Show success toast (user-initiated action uses react-toastify)
+        toastify.success('Post deleted successfully');
       }
     } catch (error) {
       console.error('Delete error:', error);
